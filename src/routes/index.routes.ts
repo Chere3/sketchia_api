@@ -11,7 +11,7 @@ router.get("/home", (req, res) => {
 });
 
 router.get("/*", (req, res) => {
-    res.send("Hello World!");
+    res.send({status: 404, message: "La página que tratas de buscar no existe."});
 });
 
 router
