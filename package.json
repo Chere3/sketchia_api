@@ -1,12 +1,12 @@
 {
   "name": "sketchia-api",
-  "version": "1.0.0",
+  "version": "1.3.2",
   "description": "La parte backend de sketchia que sirve para dar con una api bonita, sencilla y rápida.",
   "main": "dist/index.js",
   "scripts": {
     "test": "nodemon src/index.ts",
-    "start": "tsc",
-    "build": "tsc"
+    "start": "node dist/src/index.js",
+    "build": "tsc -p ."
   },
   "repository": {
     "type": "git",
