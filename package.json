@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "test": "nodemon src/index.ts",
-    "start": "node dist/src/index.js",
+    "start": "tsc -p . && node dist/src/index.js",
     "build": "tsc -p ."
   },
   "repository": {
@@ -24,6 +24,9 @@
   },
   "homepage": "https://github.com/Chere3/sketchia_proyecto#readme",
   "dependencies": {
+    "@sentry/node": "^7.21.1",
+    "@sentry/profiling-node": "^0.0.12",
+    "@sentry/tracing": "^7.21.1",
     "@supabase/supabase-js": "^2.0.5",
     "@types/compression": "^1.7.2",
     "@types/csurf": "^1.11.2",
