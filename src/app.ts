@@ -37,12 +37,15 @@ export const config = {
   supabase: {
     url: process.env.SUPABASE_URL as string,
     key: process.env.SUPABASE_KEY as string,
+    serviceRole: process.env.SUPABASE_SERVICE_ROLE as string,
   }
 }
 
 
-export const supabase = createClient(config.supabase.url, config.supabase.key)
+export const supabase = createClient(config.supabase.url, config.supabase.key);
+export const supabaseAdmin = createClient(config.supabase.url, config.supabase.serviceRole);
 console.log('🌴🎄 | Conectado a supabase con la url: ' + config.supabase.url.slice(0, 20) + '...');
+console.log('🌴👑 | Conectado a supabase como admin con la key: ' + config.supabase.key.slice(0, 20) + '...');
 
 app.listen(config.serverConfig.port, () => {
   console.log(`🔌🔦 | Servidor corriendo en el url ${config.serverConfig.url}:${config.serverConfig.port}`);
