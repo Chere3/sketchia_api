@@ -6,8 +6,10 @@ import * as express from 'express';
 import helmet from 'helmet';
 
 import {config as dotConfig} from 'dotenv';
-import { createClient } from '@supabase/supabase-js';
 import { ProfilingIntegration } from '@sentry/profiling-node';
+import {getFirestore} from 'firebase/firestore';
+import {initializeApp} from 'firebase/app';
+import {getAuth} from 'firebase/auth';
 
 const app = express();
 
@@ -57,20 +59,24 @@ export const config = {
     port: process.env.PORT || 3000 as number,
     url: process.env.URL || 'http://localhost',
   },
-  supabase: {
-    url: process.env.SUPABASE_URL as string,
-    key: process.env.SUPABASE_KEY as string,
-    serviceRole: process.env.SUPABASE_SERVICE_ROLE as string,
+  firebase: {
+    apiKey: process.env.API_KEY as string,
+    authDomain: process.env.AUTH_DOMAIN as string,
+    projectId: process.env.PROJECT_ID as string,
+    storageBucket: process.env.STORAGE_BUCKET as string,
+    messagingSenderId: process.env.MESSAGING_SENDER_ID as string,
+    appId: process.env.APP_ID as string,
+    measurementId: process.env.MEASUREMENT_ID as string,
   }
 }
 
+// Initialize Firebase
+const firebase = initializeApp(config.firebase);
+export const db = getFirestore(firebase);
+export const auth = getAuth(firebase);
 
-
-
-export const supabase = createClient(config.supabase.url, config.supabase.key);
-export const supabaseAdmin = createClient(config.supabase.url, config.supabase.serviceRole);
-console.log('🌴🎄 | Conectado a supabase con la url: ' + config.supabase.url.slice(0, 20) + '...');
-console.log('🌴👑 | Conectado a supabase como admin con la key: ' + config.supabase.key.slice(0, 20) + '...');
+console.log(`🎄 | Firestore inicializado.`);
+console.log(`🎄 | Modúlos de autenticación inicializados.`);
 
 app.listen(config.serverConfig.port, () => {
   console.log(`🔌🔦 | Servidor corriendo en el url ${config.serverConfig.url}:${config.serverConfig.port}`);
