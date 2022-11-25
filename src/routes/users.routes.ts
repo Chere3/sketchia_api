@@ -1,25 +1,71 @@
 import { Router } from "express";
+import { supabase, supabaseAdmin } from "../app";
 
 const router = Router();
 
-router.get("/", (req, res) => {
-    res.send("Hello World!");
+router.get("/", async (req, res) => {
+    const {data, error} = await supabaseAdmin.auth.admin.listUsers();
+
+    console.log(error)
+    if (error) return res.status(500).send({message: "Hemos detectado un error interno en nuestros sistemas, por lo cuál es necesario que le echemos un vistazo, espera de mientras que nuestro equipo se ocupa de ello.", status: 500})
+    return res.send({message: "Usuarios obtenidos correctamente.", status: 200, data});
 });
 
-router.get("/:id", (req, res) => {
-    res.send("Hello World!");
+
+router.get("/:id", async (req, res) => {
+    const {id} = req.params;
+
+    if (!id) return res.status(400).send({message: "No has mandado el ID del usuario, su nombre de usuario o su email", status: 400});
+    const {data, error} = await supabaseAdmin.auth.admin.getUserById(id);
+
+
+    if (error?.message.includes("User not found")) return res.status(404).send({message: "No se ha encontrado el usuario.", status: 404});
+    console.log(error)
+    if (error) return res.status(500).send({message: "Hemos detectado un error interno en nuestros sistemas, por lo cuál es necesario que le echemos un vistazo, espera de mientras que nuestro equipo se ocupa de ello.", status: 500})
+
+    return res.send({message: "Usuario encontrado correctamente.", status: 200, data});
 });
 
-router.post("/add", (req, res) => {
-    res.send("Hello World!");
+router.delete("/:id", async (req, res) => {
+    const {id} = req.params;
+
+    if (!id) return res.status(400).send({message: "No has mandado el ID del usuario, su nombre de usuario o su email", status: 400});
+    const {data, error} = await supabaseAdmin.auth.admin.deleteUser(id);
+
+    if (error?.message.includes("User not found")) return res.status(404).send({message: "No se ha encontrado el usuario.", status: 404});
+    console.log(error)
+    if (error) return res.status(500).send({message: "Hemos detectado un error interno en nuestros sistemas, por lo cuál es necesario que le echemos un vistazo, espera de mientras que nuestro equipo se ocupa de ello.", status: 500})
+
+    return res.send({message: "Usuario eliminado correctamente.", status: 200, data});
 });
 
-router.patch("/edit", (req, res) => {
-    res.send("Hello World!");
+router.put("/:id", async (req, res) => {
+    const {id} = req.params;
+    const body = req.body;
+
+    if (!id) return res.status(400).send({message: "No has mandado el ID del usuario, su nombre de usuario o su email", status: 400});
+    const {data, error} = await supabaseAdmin.auth.admin.updateUserById(id, body);
+
+    if (error?.message.includes("User not found")) return res.status(404).send({message: "No se ha encontrado el usuario.", status: 404}); 
+
+    console.log(error)
+    if (error) return res.status(500).send({message: "Hemos detectado un error interno en nuestros sistemas, por lo cuál es necesario que le echemos un vistazo, espera de mientras que nuestro equipo se ocupa de ello.", status: 500})
+    return res.send({message: "Usuario actualizado correctamente.", status: 200, data});
 });
 
-router.delete("/delete", (req, res) => {
-    res.send("Hello World!");
+router.post("/:id", async (req, res) => {
+    const {id} = req.params;
+    const body = req.body;
+
+    if (!id) return res.status(400).send({message: "No has mandado el ID del usuario, su nombre de usuario o su email", status: 400});
+    const {data, error} = await supabaseAdmin.auth.admin.createUser(body);
+    
+    if (error?.message.includes("User not found")) return res.status(404).send({message: "No se ha encontrado el usuario.", status: 404});
+
+    console.log(error)
+    if (error) return res.status(500).send({message: "Hemos detectado un error interno en nuestros sistemas, por lo cuál es necesario que le echemos un vistazo, espera de mientras que nuestro equipo se ocupa de ello.", status: 500})
+    return res.send({message: "Usuario actualizado correctamente.", status: 200, data});
 });
+
 
 module.exports = router;
