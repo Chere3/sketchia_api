@@ -2,6 +2,7 @@ import * as compression from 'compression';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import * as express from 'express';
+import * as NodeCache from 'node-cache';
 
 import helmet from 'helmet';
 
@@ -34,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression({level: 5}));
 
+export const node_cache = new NodeCache({stdTTL: 60 * 60 * 24, checkperiod: 60 * 60 * 24});
 
 
 // Routes
