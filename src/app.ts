@@ -35,6 +35,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(compression({level: 5}));
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'https://beta.sketchia.com.mx');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
+
 export const node_cache = new NodeCache({stdTTL: 60 * 60 * 24, checkperiod: 60 * 60 * 24});
 
 
