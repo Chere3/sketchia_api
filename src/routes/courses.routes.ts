@@ -18,6 +18,7 @@ router.get("/", async (req, res) => {
     node_cache.set("courses", courses);
     return res.json({message: "Todos los cursos han sido listados.", status: 200, courses});
     } else {
+    if (req.query.limit) return res.json({message: "Todos los cursos han sido listados.", status: 200, courses: (node_cache.get("courses") as any).slice(0, req.query.limit as any)});
     return res.json({message: "Todos los cursos han sido listados.", status: 200, courses: node_cache.get("courses")});
     }
     } catch (error) {
