@@ -6,8 +6,8 @@ const router = Router();
 
 router.get("/", async (req, res) => {
     try {
-        if (!node_cache.get("courses")) {
-            const querySnapshot = await getDocs(collection(db, "courses"));
+        if (!node_cache.get("blogs")) {
+            const querySnapshot = await getDocs(collection(db, "blogs"));
             const blogs = await querySnapshot.docs.map((doc) => {return {id: doc.id, data: doc.data()}});
 
             node_cache.set("blogs", blogs)
@@ -21,16 +21,17 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
+    const {id} = req.params;
     try {
-        if (!node_cache.get("blogs")) {
+        if (!node_cache.get(`Largeblog_${id}`)) {
             const {id} = req.params;
-            const blog = await getDoc(doc(db, "blogs", id));
-
+            const blog = await getDoc(doc(db, "largeBlogsData", id));
             if (!blog.exists()) return res.json({message: "El blog no existe.", status: 404});
+            node_cache.set(`Largeblog_${id}`, blog.data());
             return res.json({message: "El blog ha sido listado.", status: 200, blog: blog.data()});
         } else {
             const {id} = req.params;
-            const blog = (node_cache.get("blogs") as any).find((blog: any) => blog.id === id);
+            const blog = (node_cache.get(`Largeblog_${id}`) as any);
             if (!blog) return res.status(404).json({message: "El blog no existe.", status: 404});
 
             return res.json({message: "El blog ha sido listado.", status: 200, blog: blog});

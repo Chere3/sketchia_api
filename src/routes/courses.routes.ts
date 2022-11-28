@@ -13,11 +13,11 @@ router.get("/", async (req, res) => {
     const querySnapshot = await getDocs(collection(db, "courses"));
     let courses = querySnapshot.docs.map((doc) => {return {id: doc.id, data: doc.data()}});
 
-
     if (req.query.limit) courses = courses.slice(0, req.query.limit as any);
     node_cache.set("courses", courses);
 
-    if ((node_cache.get("courses") as any).length !== courses.length) node_cache.del("courses");
+    if ((node_cache.get("courses") as any)?.length < 18) node_cache.del("courses");
+    if ((node_cache.get("courses") as any)?.length !== courses?.length) node_cache.del("courses");
 
     return res.json({message: "Todos los cursos han sido listados.", status: 200, courses});
     } else {
@@ -25,22 +25,23 @@ router.get("/", async (req, res) => {
     return res.json({message: "Todos los cursos han sido listados.", status: 200, courses: node_cache.get("courses")});
     }
     } catch (error) {
+        console.log(error)
         return res.json({message: "Error al listar los cursos.", status: 500, error});
     }
 });
 
 router.get("/:id", async (req, res) => {
     try {
-        if (!node_cache.get("courses")) {
+        if (!node_cache.get("Largecourses")) {
         const {id} = req.params;
-        const course = doc(db, "courses", id);
+        const course = doc(db, "largeCoursesData", id);
         const courseData = await getDoc(course);
 
         if (!courseData.exists()) return res.json({message: "El curso no existe.", status: 404});
         return res.json({message: "El curso ha sido listado.", status: 200, course: courseData.data()});
         } else {
         const {id} = req.params;
-        const course = (node_cache.get("courses") as any).find((course: any) => course.id === id);
+        const course = (node_cache.get("LargeCourses") as any).find((course: any) => course.id === id);
         if (!course) return res.json({message: "El curso no existe.", status: 404});
 
         return res.json({message: "El curso ha sido listado.", status: 200, course: course});
