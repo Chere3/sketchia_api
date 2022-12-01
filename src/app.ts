@@ -2,6 +2,7 @@ import * as compression from 'compression';
 import * as Sentry from '@sentry/node';
 import * as Tracing from '@sentry/tracing';
 import * as express from 'express';
+import * as NodeCache from 'node-cache';
 
 import helmet from 'helmet';
 
@@ -10,8 +11,9 @@ import { ProfilingIntegration } from '@sentry/profiling-node';
 import {getFirestore} from 'firebase/firestore';
 import {initializeApp} from 'firebase/app';
 import {getAuth} from 'firebase/auth';
+import {getStorage} from 'firebase/storage';
 
-const app = express();
+const app = express().disable('cross-origin-resource-policy');
 
 
 dotConfig();
@@ -29,17 +31,28 @@ Sentry.init({
 // Middlewares
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
-app.use(helmet());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(compression({level: 5}));
 
+app.use(function(req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
+
+export const node_cache = new NodeCache({stdTTL: 60 * 60 * 24, checkperiod: 60 * 60 * 24});
 
 
 // Routes
 app.use('/v0/users', require('./routes/users.routes'));
+app.use('/v0/cdn', require('./routes/cdn.routes'));
 app.use('/v0/files', require('./routes/files.routes'));
 app.use('/v0/courses', require('./routes/courses.routes'));
+app.use('/v0/blogs', require('./routes/blog.routes'));
 app.use('/v0/auth', require('./routes/auth.routes'));
 app.use('/v0/staff', require('./routes/staff.routes'));
 app.use('/v0/', require('./routes/index.routes'));
@@ -74,9 +87,11 @@ export const config = {
 const firebase = initializeApp(config.firebase);
 export const db = getFirestore(firebase);
 export const auth = getAuth(firebase);
+export const storage = getStorage(firebase);
 
 console.log(`🎄 | Firestore inicializado.`);
 console.log(`🎄 | Modúlos de autenticación inicializados.`);
+console.log(`🎄 | Modúlos de almacenamiento inicializados.`);
 
 app.listen(config.serverConfig.port, () => {
   console.log(`🔌🔦 | Servidor corriendo en el url ${config.serverConfig.url}:${config.serverConfig.port}`);
